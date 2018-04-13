@@ -7,24 +7,26 @@ import gameServer from './gameServer'
 const seedURL = './seeds/seed1.seed'
 const updateTime = 1000
 
-const line = `<div id=":y" class="row"><\div>`
-const cell = `<div id=":y-:x" class="col-sm"><\div>`
-
+const emptyCellColor = '#dcdcdc'
 const aliveCellColor = '#06fe00'
-const deadCellColor  = '#ffffff'
+const deadCellColor  = '#000000'
 
+const line = `<div id=":y" class="row" style="height:` + 100/72 + `%; background-color:` + emptyCellColor +`"><\div>`
+const cell = `<div id=":y_:x" class="col"><\div>`
 
-for(var y = 0; y <= 65; ++y) {
+for(var y = -65; y <= 65; ++y) {
       $('#grid').append(line.replace(':y', y))
-      for(var x = 0; x <= 35; ++x)
+      for(var x = -35; x <= 35; ++x)
         $('#' + y).append(cell.replace(':y', y).replace(':x', x))
 }
 
 gameServer.onMessage = (message) => {
     const messageData = message.data
+    const cellLines = JSON.parse(messageData).cells
 
-    for(const cell of messageData)
-      $('#' + cell.y + '-' + cell.x).css('color', cell.alive ? aliveCellColor : deadCellColor)
+    for(const y in cellLines)
+      for(const x in cellLines[y] || {})
+        $('#' + y + '_' + x).css('background-color', cellLines[y][x].alive ? aliveCellColor : deadCellColor)
     // console.log('LA DATA', messageData)
 }
 
